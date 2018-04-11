@@ -43,6 +43,7 @@ namespace Sitecore.Support.Publishing.Service.Events
 
       bool sharedFieldChanged = false;
       bool unversionedFieldChanged = false;
+      bool propertyChanged = savedItemChanges.HasPropertiesChanged;
 
       if (savedItemChanges.HasFieldsChanged)
       {
@@ -62,12 +63,12 @@ namespace Sitecore.Support.Publishing.Service.Events
         }
       }
 
-      var updateVariantRevisions = sharedFieldChanged || unversionedFieldChanged;
+      var updateVariantRevisions = sharedFieldChanged || unversionedFieldChanged || propertyChanged;
 
       if (updateVariantRevisions)
       {
         var versionsToUpdate =
-            savedItem.Versions.GetVersions(includeAllLanguages: sharedFieldChanged).Where(v => v.Version.Number != savedItem.Version.Number || v.Language != savedItem.Language).ToArray();
+            savedItem.Versions.GetVersions(includeAllLanguages: (sharedFieldChanged || propertyChanged)).Where(v => v.Version.Number != savedItem.Version.Number || v.Language != savedItem.Language).ToArray();
 
         _logger.Debug(string.Format("Starting to update the revisions for all versions of the item: {0}", savedItem.ID));
 
